@@ -1,11 +1,6 @@
 #!/usr/bin/env node
-// Trying http get requirest from node
-// References: 
-//     http://nodejs.org/api/http.html#http_http_request_options_callback
-//     http://docs.nodejitsu.com/articles/HTTP/clients/how-to-create-a-HTTP-request
-// Possible ways this program can be tried 
-//     do an http get to google.com
-//     get random number between 1 and 10 from www.random.org/integers/?num=1&min=1&max=10&col=1&base=10&format=plain&rnd=new
+// Trying to collect (http GET) user feedbacks on indeed.com for different companies 
+// and put them into local mongo database.
 
 var http = require('http');
 var cheerio = require('cheerio');
