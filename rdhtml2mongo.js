@@ -26,9 +26,9 @@ var indeedReviewSchema = mongoose.Schema({
 });
 var reviewModel = mongoose.model('reviewModel', indeedReviewSchema); 
 ////////////////
-var companies = ['Lsi', ];
-for(var i = 0; i < companies.lenght; i++){
-var company = companies[i];
+var companies = ['Lsi', 'Google', 'Cadence'];
+//for(var i = 0; i < companies.length; i++){
+var company = companies[1];
 
 var options = {
     host: 'www.indeed.com',
@@ -46,8 +46,8 @@ var callback_httpreq = function(response){
     response.on('data', function(chunk){page += chunk;});
     response.on('end', function(){
         var $ = cheerio.load(page);
+        var company_name = $('#company_name').children('.fn').text();
         $('.company_review_container').each(function(index, value){ 
-            var company_name = company;
             var rating = $(this).children('div').children('.company_ratings').children('span').children().children().attr("title");
             var review_title = $(this).children('div').children('.review_title').text();
             var reviewer_job_title = $(this).children('div').children('.review_subtitle').children('.reviewer_job_title').children().text();
@@ -60,7 +60,8 @@ var callback_httpreq = function(response){
             var review_helpful_no = $(this).children('div').children('.review_feedback').children('.review_vote').children().eq(1).children('.voteText').children().text();
             var review = new reviewModel({"company_name": company_name, "rating": rating, "review_title": review_title, "reviewer_job_title": reviewer_job_title, "reviewer_job_location": reviewer_job_location, "date_reviewed": date_reviewed, "review_pros": review_pros, "review_cons": review_cons, "description": description, "review_helpful_yes": review_helpful_yes, "review_helpful_no": review_helpful_no });
             review.save(function(err, review){if(err){console.log("Error saving review to mongo")}});
-            fs.writeFile('companyReviews.txt', JSON.stringify(review), function(err){if(err){console.log("Error writting file")}} );
+            var reviewFile = fs.createWriteStream('companyReviews.txt', {'flags': 'a'});
+            reviewFile.write(JSON.stringify(review)+"\n");
         });
         $('.company_reviews_pagination_link_nav').each(function(index, value){ // if there is next page go there.. recursively
             if ($(value).text() === "Next »"){
@@ -73,8 +74,9 @@ var callback_httpreq = function(response){
             }
         }); 
     });
-}
+};
 
 var request = http.request(options, callback_httpreq); 
 request.on('error', function(e){console.log('Problems with request ' + e.message);});
 request.end();
+//}
